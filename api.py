@@ -54,6 +54,39 @@ def me():
     user = User.query.get(request.user_id)
     return jsonify({'id': user.id, 'email': user.email, 'role': user.role.value})
 
+# Summary for dashboard: logged-in user details + reportees info
+@api_bp.route('/me/summary', methods=['GET'])
+@auth_required()
+def me_summary():
+    user = User.query.get(request.user_id)
+    # Try to map a User to an Employee by email (if exists)
+    employee = Employee.query.filter_by(email=user.email).first()
+
+    # For managers, get reportees (employees with manager_id = user.id)
+    reportees = []
+    if user.role == RoleEnum.MANAGER:
+        team = Employee.query.filter_by(manager_id=user.id).all()
+        reportees = [{
+            'id': e.id,
+            'name': e.name,
+            'email': e.email,
+            'designation': e.designation
+        } for e in team]
+
+    payload = {
+        'id': user.id,
+        'email': user.email,
+        'role': user.role.value,
+        'employee': ({
+            'id': employee.id,
+            'name': employee.name,
+            'designation': employee.designation
+        } if employee else None),
+        'reportees_count': len(reportees),
+        'reportees': reportees
+    }
+    return jsonify(payload)
+
 # Employee CRUD (Admin + Manager limited)
 @api_bp.route('/employees', methods=['GET'])
 @auth_required()

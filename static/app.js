@@ -50,6 +50,7 @@ vm.designations = [
     $http.post('/api/auth/login', vm.loginForm).then(function(res){
       vm.setAuth(res.data.token, res.data.role);
       vm.view = 'dashboard';
+      vm.fetchDashboardSummary();
       vm.fetchEmployees();
       if(vm.role==='admin') vm.fetchTeam();
     }, function(err){ vm.loginError = err.data && err.data.error ? err.data.error : 'Login failed'; });
@@ -69,7 +70,11 @@ vm.designations = [
     });
   };
 
-  vm.viewEmployee = function(e){ vm.view='dashboard'; vm.selectedEmp = e.id; vm.loadMetrics(e.id); };
+  vm.viewEmployee = function(e, view='dashboard'){ 
+    vm.view=view; 
+    vm.selectedEmp = e.id; 
+    vm.loadMetrics(e.id); 
+  };
 
   vm.addAllMetrics = function(emp) {
   // Loop through all metrics and send scores + comments
@@ -163,6 +168,18 @@ vm.designations = [
     $http.get('/api/team/aggregate').then(function(res){ vm.team = res.data; });
   };
 
+  // Dashboard summary: current user + reportees
+  vm.fetchDashboardSummary = function(){
+    $http.get('/api/me/summary').then(function(res){
+      vm.dashboard = res.data;
+      if (vm.dashboard && vm.dashboard.employee && vm.dashboard.employee.id) {
+        vm.loadMetrics(vm.dashboard.employee.id);
+      } else {
+        vm.chartData = null;
+      }
+    });
+  };
+
   // Generate dynamic avatar color based on name
   vm.getAvatarColor = function(name) {
     if (!name) return 1;
@@ -176,6 +193,6 @@ vm.designations = [
   };
 
   // on load
-  if(vm.token) vm.fetchEmployees();
+  if(vm.token) { vm.fetchDashboardSummary(); vm.fetchEmployees(); }
 
 }]);
