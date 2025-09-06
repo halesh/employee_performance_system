@@ -3,6 +3,9 @@ angular.module('PerfApp', [])
   const vm = this;
   vm.view = 'about';
   vm.loginForm = {};
+  vm.pwd = { current: '', new: '', confirm: '' };
+  vm.pwdError = null;
+  vm.pwdMsg = null;
   vm.newEmp = {};
   vm.employees = [];
   vm.team = [];
@@ -44,6 +47,39 @@ vm.designations = [
   }
 
   vm.logout = function(){ localStorage.clear(); vm.token=null; vm.role=null; vm.view='about'; vm.employees=[]; vm.team=[]; };
+
+  vm.resetPassword = function(){
+    vm.pwdError = null; vm.pwdMsg = null;
+    if (!vm.pwd.current || !vm.pwd.new || !vm.pwd.confirm) {
+      vm.pwdError = 'Please fill out all fields.'; return;
+    }
+    if (vm.pwd.new !== vm.pwd.confirm) {
+      vm.pwdError = 'New password and confirm password do not match.'; return;
+    }
+    if (vm.pwd.new.length < 6) {
+      vm.pwdError = 'New password must be at least 6 characters.'; return;
+    }
+    $http.post('/api/auth/change_password', {
+      current_password: vm.pwd.current,
+      new_password: vm.pwd.new
+    }).then(function(res){
+      vm.pwdMsg = 'Password updated successfully.';
+      // Close modal after a brief delay
+      setTimeout(function(){
+        try {
+          var modalEl = document.getElementById('resetPwdModal');
+          if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+            var instance = window.bootstrap.Modal.getInstance(modalEl) || new window.bootstrap.Modal(modalEl);
+            instance.hide();
+          }
+        } catch (e) {}
+        vm.pwd = { current: '', new: '', confirm: '' };
+        vm.pwdError = null; vm.pwdMsg = null;
+      }, 600);
+    }, function(err){
+      vm.pwdError = (err.data && (err.data.error || err.data.message)) || 'Failed to update password';
+    });
+  };
 
   vm.login = function(){
     vm.loginError = null;

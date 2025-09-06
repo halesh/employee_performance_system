@@ -48,6 +48,24 @@ def login():
     token = generate_token(user)
     return jsonify({'token': token, 'role': user.role.value})
 
+@api_bp.route('/auth/change_password', methods=['POST'])
+@auth_required()
+def change_password():
+    data = request.json or {}
+    current = data.get('current_password')
+    new = data.get('new_password')
+    if not current or not new:
+        return jsonify({'error': 'current_password & new_password required'}), 400
+    user = User.query.get(request.user_id)
+    if not user or not user.verify_password(current):
+        return jsonify({'error': 'current password is incorrect'}), 400
+    # Optional: basic password policy
+    if len(new) < 6:
+        return jsonify({'error': 'new password must be at least 6 characters'}), 400
+    user.set_password(new)
+    db.session.commit()
+    return jsonify({'message': 'password updated successfully'})
+
 @api_bp.route('/me', methods=['GET'])
 @auth_required()
 def me():
