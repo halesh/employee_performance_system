@@ -163,6 +163,18 @@ vm.designations = [
     $http.get('/api/team/aggregate').then(function(res){ vm.team = res.data; });
   };
 
+  // Generate dynamic avatar color based on name
+  vm.getAvatarColor = function(name) {
+    if (!name) return 1;
+    // Simple hash function to generate consistent color index
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    // Return color index between 1-8
+    return Math.abs(hash % 8) + 1;
+  };
+
   // on load
   if(vm.token) vm.fetchEmployees();
 
