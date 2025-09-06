@@ -1,4 +1,4 @@
-body { padding-top: 56px; }
+body { padding-top: 0; margin: 0; }
 .container { max-width: 1000px; }
 
 .avatar-circle {
@@ -81,4 +81,110 @@ body { padding-top: 56px; }
   font-size: 0.85rem;
   padding: 6px 12px;
   border-radius: 20px;
+}
+
+/* Navbar Enhancements */
+.navbar-gradient {
+  background: linear-gradient(135deg, #1f3b73 0%, #3a8dde 50%, #6f84ff 100%);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.navbar .navbar-brand span {
+  letter-spacing: 0.6px;
+  font-size: 1.15rem;
+}
+.navbar .nav-link {
+  position: relative;
+  color: rgba(255,255,255,0.92);
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  transition: background-color .2s ease, color .2s ease, transform .2s ease;
+}
+.navbar .nav-link:hover {
+  color: #ffffff;
+  background-color: rgba(255,255,255,0.12);
+  transform: translateY(-1px);
+}
+.navbar .nav-link.active {
+  color: #0b5ed7;
+  background-color: #ffffff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+.navbar .navbar-toggler {
+  border: none;
+}
+.navbar .navbar-toggler:focus {
+  box-shadow: none;
+}
+
+/* Modern Nav Buttons */
+.btn-nav-primary {
+  color: #0b2756;
+  background: linear-gradient(135deg, #ffffff 0%, #e9f1ff 100%);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+}
+.btn-nav-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  background: #ffffff;
+}
+.btn-nav-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.14);
+}
+
+.btn-nav-outline {
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-weight: 600;
+  transition: background .2s ease, color .2s ease, transform .15s ease, box-shadow .15s ease;
+}
+.btn-nav-outline:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+}
+.btn-nav-outline:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.14);
+}
+
+/* Soft Buttons for Cards */
+.btn-soft-primary {
+  color: #0b3665;
+  background: #e8f0ff;
+  border: 1px solid #cfe0ff;
+}
+.btn-soft-primary:hover {
+  color: #072b53;
+  background: #dce8ff;
+  border-color: #bad1ff;
+}
+.btn-soft-primary:active {
+  color: #062446;
+  background: #d2e0ff;
+  border-color: #a8c5ff;
+}
+
+.btn-soft-secondary {
+  color: #2c2c2c;
+  background: #f0f2f5;
+  border: 1px solid #e2e6ea;
+}
+.btn-soft-secondary:hover {
+  color: #212121;
+  background: #e7eaee;
+  border-color: #d4dae0;
+}
+.btn-soft-secondary:active {
+  color: #1b1b1b;
+  background: #dde2e7;
+  border-color: #c5cdd6;
 }
