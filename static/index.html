@@ -159,8 +159,8 @@
           <div class="col-lg-12">
             <div class="card border-0 shadow-sm rounded-4 mb-4">
               <div class="card-body d-flex align-items-center gap-3 flex-wrap">
-                <div class="avatar-circle" ng-class="'avatar-color-' + (vm.getAvatarColor((vm.dashboard.employee && vm.dashboard.employee.name) || vm.dashboard.email))">
-                  <i class="bi bi-person-fill fs-1 text-white"></i>
+                <div class="avatar-simple">
+                  <i class="bi bi-person-fill"></i>
                 </div>
 
                 <div class="flex-grow-1">
@@ -202,9 +202,8 @@
                       <div class="card-body text-center d-flex flex-column">
           
                         <!-- Avatar -->
-                        <div class="avatar-circle mx-auto mb-3" 
-                             ng-class="'avatar-color-' + (vm.getAvatarColor(e.name))">
-                          <i class="bi bi-person-fill fs-1 text-white"></i>
+                        <div class="avatar-simple mx-auto mb-3">
+                          <i class="bi bi-person-fill"></i>
                         </div>
           
                         <!-- Employee Info -->

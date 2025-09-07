@@ -212,6 +212,22 @@ body { padding-top: 0; margin: 0; }
   border-bottom-right-radius: 999px;
 }
 
+/* Simple avatar (neutral, minimal) */
+.avatar-simple {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e9ecef; /* light gray */
+  color: #6c757d; /* secondary icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+}
+.avatar-simple .bi {
+  font-size: 1.5rem;
+}
+
 /* Metrics Table Enhancements */
 .metrics-card .card-body {
   background: #f8fafc;
