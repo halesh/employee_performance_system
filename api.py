@@ -174,7 +174,17 @@ def get_metrics(eid):
     if month:
         query = query.filter(MetricEntry.month_year == month)
     metrics = query.all()
-    metrics = [{'id': m.id, 'metric_key': m.metric_key, 'score': m.score, 'comment': m.comment, 'month': m.month} for m in emp.metrics]
+    # Serialize the filtered metrics (do not use emp.metrics here, as it ignores the filter)
+    metrics = [
+        {
+            'id': m.id,
+            'metric_key': m.metric_key,
+            'score': m.score,
+            'comment': m.comment,
+            'month': m.month_year
+        }
+        for m in metrics
+    ]
     return jsonify(metrics)
 
 @api_bp.route('/employees/<int:eid>/metrics', methods=['POST'])
@@ -185,13 +195,12 @@ def add_metric(eid):
     if request.user_role == RoleEnum.MANAGER.value and emp.manager_id != request.user_id:
         return jsonify({'error':'forbidden'}), 403
     data = request.json or {}
-    metric_key = data.get('metric_key')
-    score = data.get('score')
-    comment = data.get('comment')
-    if metric_key is None or score is None:
-        return jsonify({'error':'metric_key & score required'}), 400
-    m = MetricEntry(employee=emp, metric_key=metric_key, score=float(score), comment=comment)
-    db.session.add(m)
+    for d in data:
+        metric_key = d.get('metric_key')
+        score = d.get('score')
+        comment = d.get('comment')
+        m = MetricEntry(employee=emp, metric_key=metric_key, score=float(score), comment=comment)
+        db.session.add(m)
     db.session.commit()
     return jsonify({'id': m.id, 'metric_key': m.metric_key}), 201
 

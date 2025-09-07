@@ -9,6 +9,8 @@ angular.module('PerfApp', [])
   vm.newEmp = {};
   vm.employees = [];
   vm.team = [];
+  vm.availableMonths = [];
+  vm.metricChart = null; // Chart.js instance holder
   vm.token = localStorage.getItem('token') || null;
   vm.role = localStorage.getItem('role') || null;
 
@@ -23,6 +25,22 @@ angular.module('PerfApp', [])
   { key: 'communication', label: 'Communication', score: null, comment: '' },
   { key: 'self_improvement', label: 'Self Improvement', score: null, comment: '' }
   ];
+
+  // Weights for each metric (sum to 1.0)
+  vm.metricWeights = {
+    quality_of_work: 0.20,
+    dependability: 0.10,
+    initiative: 0.10,
+    adaptability: 0.10,
+    compliance: 0.10,
+    interpersonal: 0.10,
+    time_management: 0.10,
+    communication: 0.10,
+    self_improvement: 0.10
+  };
+
+  // Canonical order of metric keys
+  vm.metricKeys = ['quality_of_work','dependability','initiative','adaptability','compliance','interpersonal','time_management','communication','self_improvement'];
 
 vm.designations = [
   "Intern",
@@ -106,10 +124,16 @@ vm.designations = [
     });
   };
 
-  vm.viewEmployee = function(e, view='dashboard'){ 
+  vm.viewEmployee = function(e, view='report'){ 
     vm.view=view; 
     vm.selectedEmp = e.id; 
-    vm.loadMetrics(e.id); 
+    vm.selectedMonth = '';
+    vm.loadAvailableMonths(e.id);
+  };
+
+  vm.addReview = function(e){ 
+    vm.view='addreview'; 
+    vm.selectedEmp = e.id;
   };
 
   vm.addAllMetrics = function(emp) {
@@ -121,7 +145,7 @@ vm.designations = [
   }));
 
   // Call backend API to save
-  $http.post(`/api/employees/${emp.id}/metrics`, payload).then(
+  $http.post(`/api/employees/${emp}/metrics`, payload).then(
     function() {
       alert("Metrics saved successfully!");
     },
@@ -131,8 +155,10 @@ vm.designations = [
   );
 };
 
-  vm.loadMetrics = function(eid){
-    $http.get('/api/employees/'+eid+'/metrics').then(function(res){
+  vm.loadMetrics = function(eid, month){
+    const url = month ? (`/api/employees/${eid}/metrics?month=${encodeURIComponent(month)}`)
+                      : (`/api/employees/${eid}/metrics`);
+    $http.get(url).then(function(res){
       const data = res.data;
       const labels = [], scores = [];
       // compute average per metric key
@@ -141,13 +167,20 @@ vm.designations = [
         if(!grouped[d.metric_key]) grouped[d.metric_key]=[];
         grouped[d.metric_key].push(d.score);
       });
-      const metricKeys = ['quality_of_work','dependability','initiative','adaptability','compliance','interpersonal','time_management','communication','self_improvement'];
-      metricKeys.forEach(k => {
+      vm.metricKeys.forEach(k => {
         labels.push(k);
         if(grouped[k]) scores.push(grouped[k].reduce((a,b)=>a+b,0)/grouped[k].length);
         else scores.push(0);
       });
       vm.chartData = {labels: labels, scores: scores};
+
+      // Compute weighted final score: Σ (score × weight)
+      let finalScore = 0;
+      vm.metricKeys.forEach((k, idx) => {
+        const w = vm.metricWeights[k] || 0;
+        finalScore += (scores[idx] || 0) * w;
+      });
+      vm.finalScore = finalScore; // 0–4 scale
       setTimeout(()=>vm.renderChart(),50);
     });
   };
@@ -160,10 +193,17 @@ vm.designations = [
   };
 
   vm.initBarChart = function() {
-  const ctx = document.getElementById('metricChart').getContext('2d');
+  const canvas = document.getElementById('metricChart');
+  if (!canvas) return;
+  // Destroy existing chart instance if present to avoid canvas-in-use errors
+  if (vm.metricChart && typeof vm.metricChart.destroy === 'function') {
+    try { vm.metricChart.destroy(); } catch(e) {}
+    vm.metricChart = null;
+  }
+  const ctx = canvas.getContext('2d');
 
   // Example: Compare metrics for one employee
-  new Chart(ctx, {
+  vm.metricChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: vm.chartData.labels,  // ["Quality", "Dependability", ...]
@@ -188,7 +228,7 @@ vm.designations = [
       scales: {
         y: {
           beginAtZero: true,
-          max: 5,
+          max: 4,
           title: { display: true, text: 'Score (%)' }
         },
         x: {
@@ -209,9 +249,50 @@ vm.designations = [
     $http.get('/api/me/summary').then(function(res){
       vm.dashboard = res.data;
       if (vm.dashboard && vm.dashboard.employee && vm.dashboard.employee.id) {
-        vm.loadMetrics(vm.dashboard.employee.id);
+        vm.loadAvailableMonths(vm.dashboard.employee.id);
       } else {
         vm.chartData = null;
+        if (vm.metricChart && typeof vm.metricChart.destroy === 'function') {
+          try { vm.metricChart.destroy(); } catch(e) {}
+          vm.metricChart = null;
+        }
+      }
+    });
+  };
+
+  // Load available months for the selected employee (distinct list from metrics)
+  vm.loadAvailableMonths = function(eid){
+    if(!eid) { vm.availableMonths = []; return; }
+    $http.get(`/api/employees/${eid}/metrics`).then(function(res){
+      const data = res.data || [];
+      const months = Array.from(new Set(data.map(d => d.month).filter(Boolean)));
+      // Sort ascending (assuming YYYY-MM or similar string)
+      months.sort();
+      vm.availableMonths = months;
+
+      // Compute overall final rating across ALL months
+      const groupedAll = {};
+      data.forEach(d => {
+        if(!groupedAll[d.metric_key]) groupedAll[d.metric_key] = [];
+        groupedAll[d.metric_key].push(d.score);
+      });
+      const avgAll = vm.metricKeys.map(k => {
+        const arr = groupedAll[k];
+        return arr && arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
+      });
+      let overall = 0;
+      vm.metricKeys.forEach((k, idx) => {
+        const w = vm.metricWeights[k] || 0;
+        overall += (avgAll[idx] || 0) * w;
+      });
+      vm.overallFinalScore = overall; // 0–4 scale
+
+      if (months.length > 0) {
+        vm.selectedMonth = months[0];
+        vm.loadMetrics(eid, vm.selectedMonth);
+      } else {
+        vm.selectedMonth = '';
+        vm.loadMetrics(eid);
       }
     });
   };

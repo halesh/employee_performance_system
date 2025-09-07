@@ -188,3 +188,87 @@ body { padding-top: 0; margin: 0; }
   background: #dde2e7;
   border-color: #c5cdd6;
 }
+
+/* Metrics Table Enhancements */
+.metrics-card .card-body {
+  background: #f8fafc;
+}
+
+.metrics-table-wrapper {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06) inset;
+}
+
+.metrics-table {
+  margin-bottom: 0;
+}
+
+.metrics-table thead.table-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.metrics-table thead th {
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.metrics-table tbody tr:hover {
+  background-color: #f3f6fb;
+}
+
+.metrics-table td:first-child {
+  width: 28%;
+}
+
+.metrics-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  align-items: center;
+}
+
+.legend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .6rem;
+  border-radius: 999px;
+  font-size: .8rem;
+  background: #eef2ff;
+  border: 1px solid #dbe4ff;
+  color: #0b3665;
+}
+
+.legend-dot {
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Score input tweaks */
+.score-input {
+  text-align: center;
+  width: 84px;
+}
+
+/* Remove number input arrows for a cleaner look (Chrome, Safari, Edge, Opera) */
+input[type='number'].score-input::-webkit-outer-spin-button,
+input[type='number'].score-input::-webkit-inner-spin-button { 
+  -webkit-appearance: none;
+  margin: 0; 
+}
+/* Firefox */
+input[type='number'].score-input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* Comment textarea */
+.metric-comment {
+  min-height: 42px;
+  resize: vertical;
+}
