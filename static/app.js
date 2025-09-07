@@ -208,37 +208,77 @@ vm.designations = [
     data: {
       labels: vm.chartData.labels,  // ["Quality", "Dependability", ...]
       datasets: [{
-        label: 'Performance Scores',
-        data: vm.chartData.scores,   // [85, 75, 90, ...]
+        label: 'Performance Score',
+        data: vm.chartData.scores,
         backgroundColor: [
-          '#4e79a7','#f28e2b','#e15759','#76b7b2',
-          '#59a14f','#edc949','#af7aa1','#ff9da7','#9c755f'
-        ]
+          '#a5c8ff', '#ffd59e', '#ff9aa2', '#a0e7e5',
+          '#b4e197', '#ffe08a', '#cbb2fe', '#ffb3c6', '#b08968'
+        ],
+        borderColor: [
+          '#6fa9ff', '#ffc36b', '#ff6b75', '#73d6d4',
+          '#93d07a', '#ffd25a', '#a999ff', '#ff91a9', '#91674d'
+        ],
+        borderWidth: 1.5,
+        borderRadius: 6,
+        barPercentage: 0.7,
+        categoryPercentage: 0.7
       }]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 8, right: 12, bottom: 8, left: 8 } },
       plugins: {
         legend: { display: false },
         title: {
           display: true,
-          text: 'Employee Performance by Metric'
+          text: 'Employee Performance by Metric',
+          padding: { top: 8, bottom: 12 },
+          color: '#333',
+          font: { weight: '600', size: 14, family: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif' }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(33, 37, 41, 0.9)',
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(ctx){
+              const v = ctx.parsed.y;
+              return ' Score: ' + (v != null ? v.toFixed(2) : '0') + ' / 4';
+            },
+            title: function(ctx){
+              // Convert snake_case to Title Case for nicer labels
+              const raw = ctx[0].label || '';
+              return raw.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+            }
+          }
         }
       },
       scales: {
         y: {
           beginAtZero: true,
           max: 4,
-          title: { display: true, text: 'Score (%)' }
+          ticks: { stepSize: 1 },
+          title: { display: true, text: 'Score (0–4)', color: '#6c757d' },
+          grid: { color: 'rgba(0,0,0,0.06)', borderDash: [4,4] }
         },
         x: {
-          title: { display: true, text: 'Performance Metrics' }
+          title: { display: true, text: 'Performance Metrics', color: '#6c757d' },
+          grid: { display: false },
+          ticks: {
+            callback: function(value, index, ticks){
+              // prettify snake_case labels
+              const raw = this.getLabelForValue(value);
+              return raw.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+            }
+          }
         }
+      },
+      animation: { duration: 700, easing: 'easeOutQuart' },
+      hover: { mode: 'nearest', intersect: true }
       }
-    }
   });
 };
-
 
   vm.fetchTeam = function(){
     $http.get('/api/team/aggregate').then(function(res){ vm.team = res.data; });
