@@ -189,6 +189,29 @@ body { padding-top: 0; margin: 0; }
   border-color: #c5cdd6;
 }
 
+/* Dashboard header search group tweaks */
+.search-group {
+  width: 100%;
+  max-width: 420px;
+}
+.search-group .input-group-text {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+.search-group .form-control {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+.search-group .form-control:focus {
+  box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+}
+.search-group .btn-clear {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
 /* Metrics Table Enhancements */
 .metrics-card .card-body {
   background: #f8fafc;
