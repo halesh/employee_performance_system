@@ -1,4 +1,9 @@
-body { padding-top: 0; margin: 0; }
+body {
+  padding-top: 0; margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 .container { max-width: 1000px; }
 
 .avatar-circle {
