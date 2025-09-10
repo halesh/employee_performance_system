@@ -42,6 +42,16 @@ angular.module('PerfApp', [])
   // Canonical order of metric keys
   vm.metricKeys = ['quality_of_work','dependability','initiative','adaptability','compliance','interpersonal','time_management','communication','self_improvement'];
 
+  // Colors aligned with metricKeys for consistent UI
+  vm.metricBgColors = [
+    '#a5c8ff', '#ffd59e', '#ff9aa2', '#a0e7e5',
+    '#b4e197', '#ffe08a', '#cbb2fe', '#ffb3c6', '#b08968'
+  ];
+  vm.metricBorderColors = [
+    '#6fa9ff', '#ffc36b', '#ff6b75', '#73d6d4',
+    '#93d07a', '#ffd25a', '#a999ff', '#ff91a9', '#91674d'
+  ];
+
 vm.designations = [
   "Intern",
   "Assocciate Software Developer",
@@ -174,6 +184,23 @@ vm.designations = [
       });
       vm.chartData = {labels: labels, scores: scores};
 
+      // Collect metric comments for display below the chart (use last non-empty comment per metric)
+      const commentsByKey = {};
+      data.forEach(d => {
+        if (d.comment && String(d.comment).trim()) {
+          commentsByKey[d.metric_key] = String(d.comment).trim();
+        }
+      });
+      vm.metricCommentsList = vm.metricKeys
+        .map((k, idx) => ({
+          key: k,
+          label: k.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase()),
+          comment: commentsByKey[k] || '',
+          score: scores[idx] || 0,
+          color: vm.metricBgColors[idx]
+        }))
+        .filter(it => it.comment);
+
       // Compute weighted final score: Σ (score × weight)
       let finalScore = 0;
       vm.metricKeys.forEach((k, idx) => {
@@ -210,14 +237,8 @@ vm.designations = [
       datasets: [{
         label: 'Performance Score',
         data: vm.chartData.scores,
-        backgroundColor: [
-          '#a5c8ff', '#ffd59e', '#ff9aa2', '#a0e7e5',
-          '#b4e197', '#ffe08a', '#cbb2fe', '#ffb3c6', '#b08968'
-        ],
-        borderColor: [
-          '#6fa9ff', '#ffc36b', '#ff6b75', '#73d6d4',
-          '#93d07a', '#ffd25a', '#a999ff', '#ff91a9', '#91674d'
-        ],
+        backgroundColor: vm.metricBgColors,
+        borderColor: vm.metricBorderColors,
         borderWidth: 1.5,
         borderRadius: 6,
         barPercentage: 0.7,

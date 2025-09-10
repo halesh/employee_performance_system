@@ -316,3 +316,19 @@ input[type='number'].score-input {
   min-height: 42px;
   resize: vertical;
 }
+
+/* Metric Comments (below chart) */
+.metric-comments .color-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.metric-comments .comment-item {
+  border-color: #eff2f7 !important;
+}
+.metric-comments .score-badge {
+  background: #f1f5ff;
+  color: #0b3665;
+  border: 1px solid #d6e2ff;
+}
