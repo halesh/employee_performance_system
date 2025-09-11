@@ -347,6 +347,20 @@
               </div>
             </div>
           </div>
+          <!-- Separate Concern Section -->
+          <div class="mt-3" ng-if="vm.concernComment">
+            <div class="card border-0 shadow-sm rounded-4 concern-card">
+              <div class="card-header concern-header d-flex align-items-center gap-2">
+                <span class="concern-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+                <h6 class="concern-title">Overall Concern</h6>
+              </div>
+              <div class="card-body concern-body">
+                <div class="concern-text" style="white-space: pre-wrap;">
+                  {{vm.concernComment}}
+                </div>
+              </div>
+            </div>
+          </div>
           </div>
           <div ng-switch-when="addreview">
             <div class="mt-4">
@@ -393,6 +407,12 @@
                           </tr>
                         </tbody>
                       </table>
+                    </div>
+
+                    <!-- Overall Concern (single entry for the entire review) -->
+                    <div class="mt-3">
+                      <label class="form-label fw-semibold">Overall Concern</label>
+                      <textarea class="form-control" rows="3" ng-model="vm.overallConcern" placeholder="Add concern, blockers, or risks for this review..."></textarea>
                     </div>
 
                     <!-- Save Button -->

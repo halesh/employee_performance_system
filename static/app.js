@@ -13,6 +13,7 @@ angular.module('PerfApp', [])
   vm.metricChart = null; // Chart.js instance holder
   vm.token = localStorage.getItem('token') || null;
   vm.role = localStorage.getItem('role') || null;
+  vm.overallConcern = '';
 
   vm.metricsList = [
   { key: 'quality_of_work', label: 'Quality of Work', score: null, comment: '' },
@@ -154,10 +155,22 @@ vm.designations = [
     comment: m.comment
   }));
 
+  // Append a single "concern" entry as its own metric record (free-text in comment)
+  if (vm.overallConcern && String(vm.overallConcern).trim()) {
+    payload.push({
+      metric_key: 'concern',
+      score: 0,
+      comment: String(vm.overallConcern).trim()
+    });
+  }
+
   // Call backend API to save
   $http.post(`/api/employees/${emp}/metrics`, payload).then(
     function() {
       alert("Metrics saved successfully!");
+      // reset inputs
+      vm.metricsList.forEach(m => { m.score = null; m.comment = ''; });
+      vm.overallConcern = '';
     },
     function(err) {
       console.error("Error saving metrics", err);
@@ -191,6 +204,16 @@ vm.designations = [
           commentsByKey[d.metric_key] = String(d.comment).trim();
         }
       });
+
+      // Capture overall concern from entries with metric_key === 'concern' (last non-empty)
+      let concernText = '';
+      data.forEach(d => {
+        if (d.metric_key === 'concern' && d.comment && String(d.comment).trim()) {
+          concernText = String(d.comment).trim();
+        }
+      });
+      vm.concernComment = concernText;
+
       vm.metricCommentsList = vm.metricKeys
         .map((k, idx) => ({
           key: k,
